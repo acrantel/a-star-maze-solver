@@ -12,10 +12,15 @@ public class Maze {
     // start and finish of the maze
     private Point start;
     private Point finish;
+    
+    /** If the maze has been successfully initialized */
+    private boolean initialized;
 
     public Maze(String fileName) {
     	if (!init(fileName)) {
-    		System.out.println("Initialization failed");
+    		initialized = false;
+    	} else {
+    	    initialized = true;
     	}
     }
     
@@ -53,6 +58,10 @@ public class Maze {
 	            }
 	        }
     	} catch (Exception e) {
+    	    // possible exceptions: FileNotFoundException, IllegalArgumentException
+    	    layout = null;
+    	    start = null;
+    	    finish = null;
     		return false;
     	} finally {
     		if (scan != null) { scan.close(); }
@@ -61,7 +70,7 @@ public class Maze {
     }
 
     public String toString() {
-        if (layout == null || layout.length == 0 || layout[0].length == 0) {
+        if (!initialized || layout == null || layout.length == 0 || layout[0].length == 0) {
             return "0 0\n";
         }
         String result = layout.length + " " + layout[0].length + "\n";
@@ -76,17 +85,22 @@ public class Maze {
     
     /** Returns the Square at the specified row and column */
     public Square at(int row, int col) {
-    	return layout[row][col];
+        if (initialized) {
+            return layout[row][col];
+        } else {
+            return null;
+        }
     }
     
     /** Returns the width (# of columns) of this Maze. */
     public int getWidth() {
-    	return layout == null? 0 : layout.length;
+    	return !initialized || layout == null? 0 : layout.length;
     }
     
     /** Returns the height (# of rows) of this Maze. */
     public int getHeight() {
-    	return layout == null || layout.length == 0 || layout[0] == null ? 0 : layout[0].length; 
+    	return !initialized || layout == null 
+    	        || layout.length == 0 || layout[0] == null ? 0 : layout[0].length; 
     }
     
     /** Returns the location of the start of the maze in the format (row, col).  */
@@ -97,5 +111,9 @@ public class Maze {
     /** Returns the location of the end of the maze in the format (row, col */
     public Point getFinish() {
         return finish;
+    }
+    
+    public boolean isInitialized() {
+        return initialized;
     }
 }
