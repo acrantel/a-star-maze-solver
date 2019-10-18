@@ -81,7 +81,11 @@ public class AgendaMazeSolver implements MazeSolver {
     /** Resets the solver stepper by clearing the agenda of locations and 
      * resetting each square's visited status */
     public void reset() {
-        agenda = new MyStack<MazeNode>();
+        if (agenda instanceof MyStack) {
+            agenda = new MyStack<MazeNode>();
+        } else {
+            agenda = new MyQueue<MazeNode>();
+        }
         visited = new boolean[maze.getHeight()][maze.getWidth()];
         for (int r = 0; r < visited.length; r++) {
             for (int c = 0; c < visited[r].length; c++) {
