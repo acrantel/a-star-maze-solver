@@ -211,13 +211,16 @@ public class AgendaMazeSolver implements MazeSolver {
         
         // ignore the first and last nodes of the solution, because those should 
         // have finish and start symbols in the maze
-        MazeNode node = getSolution().getPrevious();
-        while (node != null && node.getPrevious() != null) {
-            // replace the character at this node with an "s", accounting for newline chars
-            int charLoc = node.getRow() * (maze.getWidth()+1) + node.getCol();
-            result = result.substring(0, charLoc)
-                    + "s" + result.substring(charLoc+1);
+        MazeNode node = getSolution();
+        if (node != null) {
             node = node.getPrevious();
+            while (node != null && node.getPrevious() != null) {
+                // replace the character at this node with an "s", accounting for newline chars
+                int charLoc = node.getRow() * (maze.getWidth()+1) + node.getCol();
+                result = result.substring(0, charLoc)
+                        + "s" + result.substring(charLoc+1);
+                node = node.getPrevious();
+            }
         }
         return result;
     }
