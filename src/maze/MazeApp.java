@@ -29,7 +29,8 @@ public class MazeApp {
                 case 'c': 
                     startSolver(scan, new AgendaMazeSolver(maze, AgendaMazeSolver.QUEUE));
                     break;
-                case 'd': //TODO add a* solver
+                case 'd': System.out.println("Currently under development, please choose a different option.");
+                //TODO add a* solver
                     break;
                 }
             } else {
