@@ -1,5 +1,6 @@
-package maze;
+package solver;
 
+import maze.MazeNode;
 
 public interface MazeSolver {
     /** Solves the maze. */
@@ -18,5 +19,7 @@ public interface MazeSolver {
 	public String getName();
 	/** Returns a "graphical" representation of the current state of the 
 	 * maze solver. */
-	public String getState();
+	public String getSolverState();
+	/** Returns a textual representation of the solution to the maze */
+	public String getSolutionString();
 }

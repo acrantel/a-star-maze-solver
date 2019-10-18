@@ -2,7 +2,6 @@ package maze;
 import java.util.Scanner;
 import java.awt.Point;
 import java.io.File;
-import java.io.FileNotFoundException;
 
 public class Maze {
     /** Stores the layout of this maze so that layout[i][j] corresponds 
@@ -51,9 +50,9 @@ public class Maze {
 	                // if the current location is a start or end, store it 
 	                // now so we don't have to calculate it later
 	                if (layout[r][c] == Square.START) {
-	                    start = new Point(r, c);
+	                    start = new Point(c, r);
 	                } else if (layout[r][c] == Square.FINISH) {
-	                    finish = new Point(r, c);
+	                    finish = new Point(c, r);
 	                }
 	            }
 	        }
@@ -94,21 +93,21 @@ public class Maze {
     
     /** Returns the width (# of columns) of this Maze. */
     public int getWidth() {
-    	return !initialized || layout == null? 0 : layout.length;
+        return !initialized || layout == null 
+                || layout.length == 0 || layout[0] == null ? 0 : layout[0].length; 
     }
     
     /** Returns the height (# of rows) of this Maze. */
     public int getHeight() {
-    	return !initialized || layout == null 
-    	        || layout.length == 0 || layout[0] == null ? 0 : layout[0].length; 
+        return !initialized || layout == null? 0 : layout.length;
     }
     
-    /** Returns the location of the start of the maze in the format (row, col).  */
+    /** Returns the location of the start of the maze in the format x = col, y = row  */
     public Point getStart() {
         return start;
     }
     
-    /** Returns the location of the end of the maze in the format (row, col */
+    /** Returns the location of the end of the maze in the format x = col, y = row */
     public Point getFinish() {
         return finish;
     }

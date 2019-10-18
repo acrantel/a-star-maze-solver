@@ -1,6 +1,14 @@
-package maze;
+package solver;
 
 import java.awt.Point;
+
+import adt.Agenda;
+import adt.MyQueue;
+import adt.MyStack;
+import maze.Maze;
+import maze.MazeNode;
+import maze.Square;
+import solver.MazeSolver;
 
 public class AgendaMazeSolver implements MazeSolver {
     private Maze maze;
@@ -40,7 +48,7 @@ public class AgendaMazeSolver implements MazeSolver {
         this.maze = maze;
         if (base == STACK) {
             agenda = new MyStack<MazeNode>();
-        } if (base == QUEUE) {
+        } else if (base == QUEUE) {
             agenda = new MyQueue<MazeNode>();
         }
         reset();
@@ -74,7 +82,7 @@ public class AgendaMazeSolver implements MazeSolver {
      * resetting each square's visited status */
     public void reset() {
         agenda = new MyStack<MazeNode>();
-        visited = new boolean[maze.getWidth()][maze.getHeight()];
+        visited = new boolean[maze.getHeight()][maze.getWidth()];
         for (int r = 0; r < visited.length; r++) {
             for (int c = 0; c < visited[r].length; c++) {
                 visited[r][c] = false;
@@ -89,7 +97,7 @@ public class AgendaMazeSolver implements MazeSolver {
     public void step() {
         if (terminated) { return; }
         // remove elements until we find one is unvisited
-        while (!agenda.isEmpty() && visited[agenda.peek().getLocation().x][agenda.peek().getLocation().y]) {
+        while (!agenda.isEmpty() && visited[agenda.peek().getLocation().y][agenda.peek().getLocation().x]) {
             agenda.remove();
         }
         // if agenda is empty, then all locations in it have been visited, so the maze is unsolvable    
@@ -101,6 +109,7 @@ public class AgendaMazeSolver implements MazeSolver {
         }
 
         MazeNode location = agenda.remove();
+        visited[location.getRow()][location.getCol()] = true;
         if (location.getType() == Square.FINISH) {
             terminated = true;
             solvedBefore = true;
@@ -129,11 +138,11 @@ public class AgendaMazeSolver implements MazeSolver {
         for (int[] offset : ADJACENTS) {
             int newCol = node.getCol() + offset[0];
             int newRow = node.getRow() + offset[1];
-            if (newCol >= visited[0].length || newCol < 0 ||
-                    newRow >= visited.length || newRow < 0 ||
-                    visited[newRow][newCol] || maze.at(newRow, newCol) == Square.WALL) {
+            if (newCol < maze.getWidth() && newCol >= 0 &&
+                    newRow < maze.getHeight() && newRow >= 0 &&
+                    !visited[newRow][newCol] && maze.at(newRow, newCol) != Square.WALL) {
                 agenda.add(new MazeNode(maze.at(newRow, newCol), 
-                        new Point(newRow, newCol), node));
+                        new Point(newCol, newRow), node));
             }
         }
     }
@@ -164,7 +173,7 @@ public class AgendaMazeSolver implements MazeSolver {
     @Override
     /** Returns a string representation of the state of the maze solver, with
      * "v" representing visited squares. */
-    public String getState() {
+    public String getSolverState() {
         String result = "";
         for (int row = 0; row < maze.getHeight(); row++) {
             for (int col = 0; col < maze.getWidth(); col++) {
@@ -177,6 +186,34 @@ public class AgendaMazeSolver implements MazeSolver {
                 }
             }
             result += "\n";
+        }
+        return result;
+    }
+    
+    @Override
+    /** Returns a string representation of the maze with the solution path 
+     * marked by "s". If the maze wan't solvable, just return a string 
+     * representation of the maze with no solution path.
+     */
+    public String getSolutionString() {
+        // get the initial string representation of the maze, without the path
+        String result = "";
+        for (int row = 0; row < maze.getHeight(); row++) {
+            for (int col = 0; col < maze.getWidth(); col++) {
+                result += maze.at(row, col).toString();
+            }
+            result += "\n";
+        }
+        
+        // ignore the first and last nodes of the solution, because those should 
+        // have finish and start symbols in the maze
+        MazeNode node = getSolution().getPrevious();
+        while (node != null && node.getPrevious() != null) {
+            // replace the character at this node with an "s", accounting for newline chars
+            int charLoc = node.getRow() * (maze.getWidth()+1) + node.getCol();
+            result = result.substring(0, charLoc)
+                    + "s" + result.substring(charLoc+1);
+            node = node.getPrevious();
         }
         return result;
     }

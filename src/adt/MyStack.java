@@ -1,4 +1,4 @@
-package maze;
+package adt;
 import java.util.Stack;
 
 public class MyStack<T> implements Agenda<T> {
