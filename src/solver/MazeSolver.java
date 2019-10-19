@@ -3,7 +3,7 @@ package solver;
 import maze.MazeNode;
 
 public interface MazeSolver {
-    /** Solves the maze. */
+    /** Solves the maze and returns whether it was solvable or not */
 	public boolean solve();
 	/** Returns the solution node of the linked list, or null if there is no solution */
 	public MazeNode getSolution();
