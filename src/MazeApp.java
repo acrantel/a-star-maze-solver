@@ -33,6 +33,8 @@ public class MazeApp {
                 //TODO add a* solver
                     break;
                 }
+            } else if (maze == null) {
+                System.out.println("Error: Must load a maze before solving.");
             } else {
                 System.out.println("Error: Invalid input.");
             }
