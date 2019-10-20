@@ -85,7 +85,7 @@ public class AStarMazeSolver implements MazeSolver {
                     !visited[newRow][newCol] && maze.at(newRow, newCol) != Square.WALL) {
                 queue.add(new WeightedMazeNode(maze.at(newRow, newCol),
                         new Point(newCol, newRow), node,
-                        node.getMovementCost(), heuristic(newRow, newCol)));
+                        node.getMovementCost()+1, heuristic(newRow, newCol)));
             }
         }
     }
@@ -158,10 +158,19 @@ public class AStarMazeSolver implements MazeSolver {
         return result;
     }
     
-
+    /**
+     * Estimated movement cost to move from the passed in location to 
+     * the final destination.
+     * @param row The row of the current location
+     * @param col The column of the current location
+     * @return The estimated cost.
+     */
     private int heuristic(int row, int col) {
-        //TODO
-        return 0;
+        // if this calculation was more resource intensive we 
+        // could add a memoization table
+        int manhattanDist = maze.getFinish().x - col 
+                + maze.getFinish().y - row;
+        return manhattanDist >= 8 ? 8 : manhattanDist;
     }
 
     @Override

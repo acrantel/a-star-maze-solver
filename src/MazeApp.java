@@ -46,11 +46,11 @@ public class MazeApp {
 
     public static void printOptions() {
         System.out.println("Options:");
-        System.out.println("a. Load file");
-        System.out.println("b. Start stack based maze solver");
-        System.out.println("c. Start queue based maze solver");
-        System.out.println("d. Start A* maze solver");
-        System.out.println("e. Quit");
+        System.out.println("   a. Load file");
+        System.out.println("   b. Start stack based maze solver");
+        System.out.println("   c. Start queue based maze solver");
+        System.out.println("   d. Start A* maze solver");
+        System.out.println("   e. Quit");
     }
 
     /** Loads the maze from a file the user specifies into the Maze class 
