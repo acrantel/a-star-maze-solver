@@ -8,17 +8,18 @@ import adt.MyStack;
 import maze.Maze;
 import maze.MazeNode;
 import maze.Square;
+import maze.WeightedMazeNode;
 import solver.MazeSolver;
 
 public class AgendaMazeSolver implements MazeSolver {
     /** Constant that specifies use of a stack-based solver */
     public static final char STACK = 's';
-
     /** Constant that specifies use of a queue-based solver */
     public static final char QUEUE = 'q';
+    
+    /** The maze to solve */
     private Maze maze;
     
-    // state variables for the step() function
     /** Whether the maze has been solved before. This is true if solve() has
      * been called or if step() has been called until terminated is true */
     private boolean solvedBefore;
@@ -26,10 +27,10 @@ public class AgendaMazeSolver implements MazeSolver {
      * list form. If finalNode is null and solvedBefore is true, then there was 
      * no solution to the maze */
     private MazeNode finalNode;
-    // state variables for the step function
+    
+    // state variables for the step() function
     /** Whether we are done stepping through the solver */
     private boolean terminated;
-
     /** Agenda of locations to explore. */
     private Agenda<MazeNode> agenda;
     /** The mazes should be relatively small, so we use a 2d boolean array
@@ -60,6 +61,7 @@ public class AgendaMazeSolver implements MazeSolver {
         if (node == null || visited.length == 0 || visited[0].length == 0) {
             return;
         }
+        // add adjacent neighbors
         for (int[] offset : ADJACENTS) {
             int newCol = node.getCol() + offset[0];
             int newRow = node.getRow() + offset[1];
@@ -69,6 +71,13 @@ public class AgendaMazeSolver implements MazeSolver {
                 agenda.add(new MazeNode(maze.at(newRow, newCol), 
                         new Point(newCol, newRow), node));
             }
+        }
+        // if node is a teleporter, add the other teleporter to the agenda
+        if (maze.isTeleporter(node.getRow(), node.getCol())) {
+            Point[] teleporters = maze.getTeleporters();
+            Point newLoc = teleporters[0].equals(node.getLocation()) ? teleporters[1] : teleporters[0];
+            agenda.add(new MazeNode(maze.at(newLoc.y, newLoc.x),
+                    new Point(newLoc.x, newLoc.y), node));
         }
     }
 
@@ -125,8 +134,9 @@ public class AgendaMazeSolver implements MazeSolver {
             while (node != null && node.getPrevious() != null) {
                 // replace the character at this node with an "s", accounting for newline chars
                 int charLoc = node.getRow() * (maze.getWidth()+1) + node.getCol();
-                result = result.substring(0, charLoc)
-                        + "s" + result.substring(charLoc+1);
+                result = result.substring(0, charLoc) +
+                        (maze.isTeleporter(node.getRow(), node.getCol()) ? "t" : "s") +
+                        result.substring(charLoc+1);
                 node = node.getPrevious();
             }
         }

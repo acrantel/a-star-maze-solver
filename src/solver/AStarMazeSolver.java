@@ -6,55 +6,26 @@ import java.util.PriorityQueue;
 import maze.Maze;
 import maze.MazeNode;
 import maze.Square;
+import maze.WeightedMazeNode;
 
 public class AStarMazeSolver implements MazeSolver {
-    class WeightedMazeNode extends MazeNode implements Comparable<WeightedMazeNode> {
-        /** The cost to move to this node */
-        private int movementCost;
-        /** The estimated cost to move from  */
-        private int heuristic;
-        
-        public WeightedMazeNode(Square type, Point location, MazeNode previous,
-                int movementCost, int heuristic) {
-            super(type, location,previous);
-            this.movementCost = movementCost;
-            this.heuristic = heuristic;
-        }
-        
-        public int getTotalWeight() {
-            return movementCost + heuristic;
-        }
-        
-        public int getMovementCost() {
-            return movementCost;
-        }
-        
-        public int getHeuristic() {
-            return heuristic;
-        }
-
-        @Override
-        public int compareTo(WeightedMazeNode n) {
-            return this.getTotalWeight() - n.getTotalWeight(); 
-        }
-    }
-    
+    /** The maze to solve */
     private Maze maze;
+    
     /** Whether the maze has been solved before. This is true if solve() has
      * been called or if step() has been called until terminated is true */
     private boolean solvedBefore;
     
-    // state variables for the step() function
     /** The last node of the solution, which stores the full solution in a linked
      * list form. If finalNode is null and solvedBefore is true, then there was 
      * no solution to the maze */
     private WeightedMazeNode finalNode;
+    
     // state variables for the step function
     /** Whether we are done stepping through the solver */
     private boolean terminated;
     /** Priority queue of locations to explore */
     private PriorityQueue<WeightedMazeNode> queue;
-    
     /** The mazes should be relatively small, so we use a 2d boolean array
      * to store whether a location has been visited. visited[i][j] 
      * corresponds to row i, column j. */
@@ -88,6 +59,14 @@ public class AStarMazeSolver implements MazeSolver {
                         node.getMovementCost()+1, heuristic(newRow, newCol)));
             }
         }
+        // if node is a teleporter, add the other teleporter to the agenda
+        if (maze.isTeleporter(node.getRow(), node.getCol())) {
+            Point[] teleporters = maze.getTeleporters();
+            Point newLoc = teleporters[0].equals(node.getLocation()) ? teleporters[1] : teleporters[0];
+            queue.add(new WeightedMazeNode(maze.at(newLoc.y, newLoc.x),
+                    new Point(newLoc.x, newLoc.y), node,
+                    node.getMovementCost()+1, heuristic(newLoc.y, newLoc.x)));
+        }
     }
     
     @Override
@@ -112,8 +91,9 @@ public class AStarMazeSolver implements MazeSolver {
 
     @Override
     /** Returns a string representation of the maze with the solution path 
-     * marked by "s". If the maze wan't solvable, just return a string 
-     * representation of the maze with no solution path. */
+     * marked by 's'. Teleportations are marked by the 't' instead. If the 
+     * maze wan't solvable, just return a string representation of the maze 
+     * with no solution path. */
     public String getSolutionString() {
         // get the initial string representation of the maze, without the path
         String result = "";
@@ -132,8 +112,9 @@ public class AStarMazeSolver implements MazeSolver {
             while (node != null && node.getPrevious() != null) {
                 // replace the character at this node with an "s", accounting for newline chars
                 int charLoc = node.getRow() * (maze.getWidth()+1) + node.getCol();
-                result = result.substring(0, charLoc)
-                        + "s" + result.substring(charLoc+1);
+                result = result.substring(0, charLoc) +
+                        (maze.isTeleporter(node.getRow(), node.getCol()) ? "t" : "s") +
+                        result.substring(charLoc+1);
                 node = node.getPrevious();
             }
         }
@@ -168,10 +149,32 @@ public class AStarMazeSolver implements MazeSolver {
     private int heuristic(int row, int col) {
         // if this calculation was more resource intensive we 
         // could add a memoization table
-        int manhattanDist = maze.getFinish().x - col 
-                + maze.getFinish().y - row;
-        return manhattanDist >= 8 ? 8 : manhattanDist;
+        Point curPt = new Point(col, row);
+        int result = getManhattanDist(maze.getFinish(), curPt);
+        if (maze.getTeleporters() != null) {
+            // estimate the distance if we used teleporters
+            Point[] teles = maze.getTeleporters();
+            // the distance of the closer teleporter to our current position
+            int distToCurPos = Math.min(getManhattanDist(teles[0], curPt),
+                    getManhattanDist(teles[1], curPt));
+            // shortest distance from a teleporter to the finish 
+            int distToFinish = Math.min(getManhattanDist(teles[0], maze.getFinish()),
+                    getManhattanDist(teles[1], maze.getFinish()));
+            int totalTeleDist = distToCurPos + distToFinish + 1;
+            if (totalTeleDist < result) {
+                result = totalTeleDist;
+            }
+        }
+        return result >= 8 ? 8 : result;
+        
     }
+    
+    /** Returns the Manhattan distance between two points (the sum of the 
+     * differences of their coordinates) */
+    private int getManhattanDist(Point a, Point b) {
+        return Math.abs(a.x - b.x)+ Math.abs(a.y - b.y); 
+    }
+    
 
     @Override
     public void reset() {

@@ -1,4 +1,5 @@
 
+import java.io.File;
 import java.util.Scanner;
 
 import maze.Maze;
@@ -13,7 +14,7 @@ public class MazeApp {
     public static void start() {
         System.out.println("---- MAZE SOLVER ----");
         Scanner scan = new Scanner(System.in);
-
+        
         while (true) {
             printOptions();
             char input = getCharInput(scan);
