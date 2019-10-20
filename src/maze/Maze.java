@@ -12,6 +12,9 @@ public class Maze {
     private Point start;
     private Point finish;
     
+    // the locations of the teleporters in the maze, or null if they do not exist 
+    private Point[] teleporters;
+    
     /** If the maze has been successfully initialized */
     private boolean initialized;
 
@@ -40,6 +43,7 @@ public class Maze {
 	        int width = Integer.parseInt(strDimensions[0]);
 	        int height = Integer.parseInt(strDimensions[1]);
 	        layout = new Square[height][width];
+	        teleporters = new Point[2];
 	        
 	        // read in each row of the maze and add it to layout
 	        String row;
@@ -53,8 +57,17 @@ public class Maze {
 	                    start = new Point(c, r);
 	                } else if (layout[r][c] == Square.FINISH) {
 	                    finish = new Point(c, r);
+	                } else if (layout[r][c] == Square.TELEPORTER) {
+	                    if (teleporters[0] == null) {
+	                        teleporters[0] = new Point(c, r);
+	                    } else {
+	                        teleporters[1] = new Point(c, r);
+	                    }
 	                }
 	            }
+	        }
+	        if (teleporters[0] == null || teleporters[1] == null) {
+	            teleporters = null;
 	        }
     	} catch (Exception e) {
     	    // possible exceptions: FileNotFoundException, IllegalArgumentException
@@ -110,6 +123,20 @@ public class Maze {
     /** Returns the location of the end of the maze in the format x = col, y = row */
     public Point getFinish() {
         return finish;
+    }
+    
+    /** Returns the locations of the teleporters, or null if they do not exist */
+    public Point[] getTeleporters() {
+        return teleporters;
+    }
+    
+    public boolean isTeleporter(int row, int col) {
+        if (teleporters != null && 
+                ((teleporters[0].y == row && teleporters[0].x == col)
+                        || (teleporters[1].y == row && teleporters[1].x == col))) {
+            return true;
+        }
+        return false;
     }
     
     public boolean isInitialized() {

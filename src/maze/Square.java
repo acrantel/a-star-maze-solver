@@ -2,7 +2,7 @@ package maze;
 
 
 public enum Square {
-    WALL('#'), OPEN_SPACE('.'), START('o'), FINISH('*');
+    WALL('#'), OPEN_SPACE('.'), START('o'), FINISH('*'), TELEPORTER('@');
 
     /** The one character long string representation of this Square */
     private final char ch;
@@ -28,6 +28,7 @@ public enum Square {
             case '.': return OPEN_SPACE;
             case 'o': return START;
             case '*': return FINISH;
+            case '@': return TELEPORTER;
             default: throw new IllegalArgumentException("Illegal character");
         }
     }
