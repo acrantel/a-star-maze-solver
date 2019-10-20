@@ -22,4 +22,7 @@ public interface MazeSolver {
 	public String getSolverState();
 	/** Returns a textual representation of the solution to the maze */
 	public String getSolutionString();
+	
+	/** Hard coded possible adjacent locations */
+    public static final int[][] ADJACENTS = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
 }

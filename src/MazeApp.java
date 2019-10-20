@@ -2,6 +2,7 @@
 import java.util.Scanner;
 
 import maze.Maze;
+import solver.AStarMazeSolver;
 import solver.AgendaMazeSolver;
 import solver.MazeSolver;
 
@@ -29,8 +30,8 @@ public class MazeApp {
                 case 'c': 
                     startSolver(scan, new AgendaMazeSolver(maze, AgendaMazeSolver.QUEUE));
                     break;
-                case 'd': System.out.println("Currently under development, please choose a different option.");
-                //TODO add a* solver
+                case 'd': 
+                    startSolver(scan, new AStarMazeSolver(maze));
                     break;
                 }
             } else if (maze == null) {
