@@ -3,9 +3,9 @@ package maze;
 import java.awt.Point;
 
 public class WeightedMazeNode extends MazeNode implements Comparable<WeightedMazeNode> {
-    /** The cost to move to this node */
+    /** The cost to move to this node from the start */
     private int movementCost;
-    /** The estimated cost to move from  */
+    /** The estimated cost to move from this node to the finish */
     private int heuristic;
     
     public WeightedMazeNode(Square type, Point location, MazeNode previous,
